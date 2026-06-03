@@ -1,27 +1,47 @@
 import os
+import logging
+
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+)
 
-TOKEN = os.environ["TELEGRAM_TOKEN"]
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🐻 Имперский бот на связи. Приказывай, Император.")
+logger = logging.getLogger(__name__)
 
-async def prognoz(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = (
-        "📡 СВОДКА ИМПЕРИИ НА СЕГОДНЯ:\n\n"
-        "⚽️ Ювентус – Верона: П1 с форой (-1.5)\n"
-        "🏀 Баскония – Бреоган: П1\n"
-        "🏀 Барселона – Гран-Канария: П1\n"
-        "⚽️ Астон Вилла – Тоттенхэм: Фора 0\n\n"
-        "💰 Банк: 500 ₽. Цель: 2000 ₽.\n"
-        "⚠️ Дисциплина: Одинар > Экспресс!"
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        "Имперский бот на связи. Приказывай, Император."
     )
-    await update.message.reply_text(text)
+
+async def ask(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        "AI-функция в разработке. Скоро здесь будет интеграция с нейросетями."
+    )
+
+async def automate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        "Модуль автоматизации находится в разработке."
+    )
+
+def main() -> None:
+    token = os.getenv("TELEGRAM_TOKEN")
+    if not token:
+        raise ValueError(
+            "Не найдена переменная окружения TELEGRAM_TOKEN"
+        )
+    application = Application.builder().token(token).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("ask", ask))
+    application.add_handler(CommandHandler("automate", automate))
+    logger.info("Imperial Bot started")
+    application.run_polling()
 
 if __name__ == "__main__":
-    app = ApplicationBuilder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("prognoz", prognoz))
-    print("🛡️ Имперский бот запущен...")
-    app.run_polling()
+    main()
